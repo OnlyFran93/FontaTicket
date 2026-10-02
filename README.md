@@ -32,9 +32,21 @@ npm run dev -- --host 0.0.0.0
 
 Busca la dirección IPv4 local del ordenador (por ejemplo `192.168.1.25`) y abre `http://192.168.1.25:5173/` en el navegador del teléfono, sustituyendo la dirección por la del ordenador. Permite el acceso en la red local si el firewall de Windows lo solicita. Para acceder desde cualquier lugar, publica el sitio compilado en `dist/` siguiendo la sección de publicación; en móvil, abre la URL HTTPS asignada por el alojamiento.
 
-## Publicar
+## Publicar e instalar como PWA
 
-Sube el proyecto a un repositorio GitHub y publícalo en cualquier alojamiento de sitios estáticos compatible con Vite. Para compilar se usa `npm run build`; el directorio publicable es `dist/`. La aplicación debe servirse desde un mismo origen estable y mediante HTTPS en producción.
+El repositorio incluye un flujo de GitHub Actions que ejecuta las pruebas, compila la aplicación con la ruta `/FontaTicket/` y la publica en GitHub Pages cuando se actualiza `main`. En GitHub, abre **Settings → Pages** y selecciona **GitHub Actions** como fuente de publicación. El repositorio actual es privado; la publicación de Pages desde repositorios privados depende del plan de GitHub. Tras el primer despliegue, la aplicación estará disponible en `https://onlyfran93.github.io/FontaTicket/`.
+
+La compilación normal (`npm run build`) usa la raíz del servidor para conservar el desarrollo y la vista previa locales. Para generar manualmente la versión de Pages en Windows PowerShell:
+
+```powershell
+$env:GITHUB_PAGES = "true"
+npm run build
+Remove-Item Env:GITHUB_PAGES
+```
+
+El sitio incluye un manifiesto instalable y un service worker que guarda la aplicación y el catálogo inicial para abrirlos sin conexión después de la primera carga. En Android, abre la URL publicada con Chrome y elige **Instalar aplicación** o **Añadir a pantalla de inicio**. En iPhone/iPad, ábrela en Safari y elige **Compartir → Añadir a pantalla de inicio**. La instalación requiere el sitio publicado mediante HTTPS. IndexedDB sigue siendo local a cada navegador/dispositivo; el service worker no sincroniza los datos.
+
+El artefacto publicable manualmente es `dist/`; para cualquier alojamiento distinto de GitHub Pages, usa `npm run build` sin `GITHUB_PAGES`.
 
 ## Datos y privacidad
 
