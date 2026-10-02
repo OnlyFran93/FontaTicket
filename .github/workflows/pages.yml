@@ -49,7 +49,8 @@ jobs:
           }
 
           for (const asset of assets) {
-            if (!asset.startsWith("/FontaTicket/assets/") || !existsSync(`dist${asset}`)) {
+            const file = `dist/${asset.replace(/^\/FontaTicket\//, "")}`;
+            if (!asset.startsWith("/FontaTicket/assets/") || !existsSync(file)) {
               throw new Error(`Recurso de Pages inválido o ausente: ${asset}`);
             }
           }
