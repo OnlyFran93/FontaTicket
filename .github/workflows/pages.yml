@@ -35,6 +35,31 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: "true"
+      - name: Verify GitHub Pages build paths
+        run: |
+          node --input-type=module <<'NODE'
+          import { existsSync, readFileSync } from "node:fs";
+
+          const html = readFileSync("dist/index.html", "utf8");
+          const assets = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)]
+            .map((match) => match[1]);
+
+          if (assets.length < 2) {
+            throw new Error("El build debe incluir bundles JavaScript y CSS.");
+          }
+
+          for (const asset of assets) {
+            if (!asset.startsWith("/FontaTicket/assets/") || !existsSync(`dist${asset}`)) {
+              throw new Error(`Recurso de Pages inválido o ausente: ${asset}`);
+            }
+          }
+
+          for (const file of ["manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png"]) {
+            if (!existsSync(`dist/${file}`)) {
+              throw new Error(`Falta un recurso de Pages: ${file}`);
+            }
+          }
+          NODE
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
